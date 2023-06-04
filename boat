@@ -1,0 +1,83 @@
+contacts = {}
+
+def input_error(func):
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except KeyError:
+            return "Контакт не знайдений."
+        except ValueError:
+            return "Невірний формат команди."
+        except IndexError:
+            return "Недостатньо аргументів для команди."
+    return wrapper
+
+@input_error
+def add_contact(name, phone_number):
+    contacts[name] = phone_number
+    return "Контакт додано!"
+
+@input_error
+def find_contact(name):
+    phone_number = contacts[name]
+    return f"Номер телефону для {name}: {phone_number}"
+
+@input_error
+def update_contact(name, phone_number):
+    contacts[name] = phone_number
+    return "Контакт оновлено!"
+
+def show_contacts():
+    if contacts:
+        result = "Список контактів:\n"
+        for name, phone_number in contacts.items():
+            result += f"{name}: {phone_number}\n"
+        return result
+    else:
+        return "Список контактів порожній."
+
+def handle_command(command):
+    command = command.lower()
+    if command == "hello":
+        return "How can I help you?"
+    elif command.startswith("add"):
+        parts = command.split()
+        if len(parts) >= 3:
+            name = parts[1]
+            phone_number = parts[2]
+            return add_contact(name, phone_number)
+        else:
+            return "Недостатньо аргументів. Формат команди: add <ім'я> <номер телефону>"
+    elif command.startswith("change"):
+        parts = command.split()
+        if len(parts) >= 3:
+            name = parts[1]
+            phone_number = parts[2]
+            return update_contact(name, phone_number)
+        else:
+            return "Недостатньо аргументів. Формат команди: change <ім'я> <новий номер телефону>"
+    elif command.startswith("phone"):
+        parts = command.split()
+        if len(parts) >= 2:
+            name = parts[1]
+            return find_contact(name)
+        else:
+            return "Недостатньо аргументів. Формат команди: phone <ім'я>"
+    elif command == "show all":
+        return show_contacts()
+    elif command in ["good bye", "close", "exit"]:
+        return "Good bye!"
+    else:
+        return "Невідома команда."
+
+def main():
+    while True:
+        command = input("Введіть команду: ")
+        result = handle_command(command)
+        print(result)
+        if result == "Good bye!":
+            break
+
+if __name__ == "__main__":
+    main()
+    
